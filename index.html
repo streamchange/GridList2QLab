@@ -140,7 +140,6 @@
       reader.onload = () => {
         try {
           const text = reader.result;
-          console.log(text)
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(text, "application/xml");
 
@@ -155,21 +154,19 @@
             [xmlDoc.documentElement.nodeName]: xmlToJson(xmlDoc.documentElement)
           };
 
-
-          //Cleanup
-          //const prettyJson = JSON.stringify(jsonResult, null, 2);
-
           //Canvas Dimensions
           var outH = jsonResult.gridList.canvas["@attributes"].outH
           var outV = jsonResult.gridList.canvas["@attributes"].outV
 
-          const numGrids = jsonResult.gridList.canvas.grid.length
+          var numGrids = jsonResult.gridList.canvas.grid.length
 
           var outputData = `Canvas Size: ${outH} x ${outV}\n\n`
 
-          for(i=0; i<numGrids; i++){
-            grid = jsonResult.gridList.canvas.grid[i]["@attributes"]
+          if (numGrids>0) {
 
+            for(i=0; i<numGrids; i++){
+              
+            grid = jsonResult.gridList.canvas.grid[i]["@attributes"]
             gridWidth = grid.tileX*grid.cols
             gridHeight = grid.tileY*grid.rows
 
@@ -182,7 +179,26 @@
             gridData = `<b>${grid.gridName}:</b>\n\t${gridWidth}px x ${gridHeight}px\n\tCtr - X:${gridCtrX} Y:${gridCtrY}\n\tBottom Left - X:${gridBLX} Y:${gridBLY}\n\n`
             
             outputData += gridData
+            
           }
+          
+          } else {
+
+            grid = jsonResult.gridList.canvas.grid["@attributes"]
+            gridWidth = grid.tileX*grid.cols
+            gridHeight = grid.tileY*grid.rows
+
+            gridCtrX = (outH/-2)+(gridWidth/2)+(parseInt(grid.offX))
+            gridCtrY = (outV/2)-(gridHeight/2)-(parseInt(grid.offY))
+
+            gridBLX = (outH/-2)+(parseInt(grid.offX))
+            gridBLY = (outV/2)-(gridHeight)-(parseInt(grid.offY))
+
+            gridData = `<b>${grid.gridName}:</b>\n\t${gridWidth}px x ${gridHeight}px\n\tCtr - X:${gridCtrX} Y:${gridCtrY}\n\tBottom Left - X:${gridBLX} Y:${gridBLY}\n\n`
+            
+            outputData += gridData
+
+        }
 
           const successMsg = [`Mission Accomplished`,`Nailed It`,`Yep Cool`,`Complete`,`Victory Secured`,`Crushed It`,`Done And Dusted`,`Superb`,`Good Jaaahb`,`Done-so`]
 
