@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Grid List → QLab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: system-ui, Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    #drop-zone {
+      border: 2px dashed #6b7280;
+      border-radius: 8px;
+      padding: 3rem;
+      text-align: center;
+      background: white;
+      color: #374151;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    #drop-zone.dragover {
+      background: #eef2ff;
+      border-color: #6366f1;
+    }
+
+    #output {
+      margin-top: 2rem;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow: auto;
+      max-height: 500px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+
+    .error {
+      color: #f87171;
+    }
+
+    .success {
+      color: #34d399;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+    small{
+      color: #cccccc;
+      filter: blur(1px);
+    }
+  </style>
+
+</head>
+<body>
+
+  <h1>Grid List → QLab</h1>
+  <p>Drag and drop a <code>.pg3</code> file, or click to select one.</p>
+
+  <div id="drop-zone">
+    Drop .pg3 file here or click to browse
+  </div>
+
+  <input id="file-input" type="file" accept=".pg3" />
+
+  <div id="output"></div>
+  <br/>
+  <small>Please dont yell at me I don't know what I'm doing</small>
+
+  <script>
+    const dropZone = document.getElementById("drop-zone");
+    const fileInput = document.getElementById("file-input");
+    const output = document.getElementById("output");
+
+    function log(message, type = "") {
+      output.innerHTML = `<div class="${type}">${message}</div>`;
+    }
+
+    /**
+     * Convert XML DOM node to JSON
+     * - Attributes stored under "@attributes"
+     * - Text nodes stored as "#text"
+     */
+    function xmlToJson(node) {
+      // Text node
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.nodeValue.trim();
+        return text.length ? text : null;
+      }
+
+      const obj = {};
+
+      // Attributes
+      if (node.attributes && node.attributes.length > 0) {
+        obj["@attributes"] = {};
+        for (const attr of node.attributes) {
+          obj["@attributes"][attr.nodeName] = attr.nodeValue;
+        }
+      }
+
+      // Child nodes
+      for (const child of node.childNodes) {
+        const childJson = xmlToJson(child);
+        if (childJson === null) continue;
+
+        const name = child.nodeName;
+
+        if (obj[name] === undefined) {
+          obj[name] = childJson;
+        } else {
+          // Convert to array if multiple nodes with same name
+          if (!Array.isArray(obj[name])) {
+            obj[name] = [obj[name]];
+          }
+          obj[name].push(childJson);
+        }
+      }
+
+      return obj;
+    }
+
+    function handleFile(file) {
+      if (!file.name.toLowerCase().endsWith(".pg3")) {
+        log("Error: Only .pg3 files are allowed.", "error");
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        try {
+          const text = reader.result;
+          console.log(text)
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(text, "application/xml");
+
+          // Detect XML errors
+          const parseError = xmlDoc.querySelector("parsererror");
+          if (parseError) {
+            throw new Error("Invalid XML format.");
+          }
+
+          // Convert XML → JSON
+          const jsonResult = {
+            [xmlDoc.documentElement.nodeName]: xmlToJson(xmlDoc.documentElement)
+          };
+
+
+          //Cleanup
+          //const prettyJson = JSON.stringify(jsonResult, null, 2);
+
+          //Canvas Dimensions
+          var outH = jsonResult.gridList.canvas["@attributes"].outH
+          var outV = jsonResult.gridList.canvas["@attributes"].outV
+
+          const numGrids = jsonResult.gridList.canvas.grid.length
+
+          var outputData = `Canvas Size: ${outH} x ${outV}\n\n`
+
+          for(i=0; i<numGrids; i++){
+            grid = jsonResult.gridList.canvas.grid[i]["@attributes"]
+
+            gridWidth = grid.tileX*grid.cols
+            gridHeight = grid.tileY*grid.rows
+
+            gridCtrX = (outH/-2)+(gridWidth/2)+(parseInt(grid.offX))
+            gridCtrY = (outV/2)-(gridHeight/2)-(parseInt(grid.offY))
+
+            gridBLX = (outH/-2)+(parseInt(grid.offX))
+            gridBLY = (outV/2)-(gridHeight)-(parseInt(grid.offY))
+
+            gridData = `<b>${grid.gridName}:</b>\n\t${gridWidth}px x ${gridHeight}px\n\tCtr - X:${gridCtrX} Y:${gridCtrY}\n\tBottom Left - X:${gridBLX} Y:${gridBLY}\n\n`
+            
+            outputData += gridData
+          }
+
+          const successMsg = [`Mission Accomplished`,`Nailed It`,`Yep Cool`,`Complete`,`Victory Secured`,`Crushed It`,`Done And Dusted`,`Superb`,`Good Jaaahb`,`Done-so`]
+
+          log(
+            `✔ ${successMsg[Math.floor(Math.random() * successMsg.length)]}\n\n`+
+            `${outputData} `+
+            ``+
+            ` `+
+            ` `+
+            ` `+
+            ` `+
+            ` `+
+            ` \n`,
+            "success"
+          );
+          //log("test")
+
+        } catch (err) {
+          log(`XML Parse Error: ${err.message}`, "error");
+        }
+      };
+
+      reader.onerror = () => {
+        log("Failed to read file.", "error");
+      };
+
+      reader.readAsText(file);
+    }
+
+    // Drag & drop handlers
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    // Click to browse
+    dropZone.addEventListener("click", () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      if (file) handleFile(file);
+    });
+  </script>
+
+</body>
+</html>
