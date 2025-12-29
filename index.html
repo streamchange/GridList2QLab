@@ -154,19 +154,22 @@
             [xmlDoc.documentElement.nodeName]: xmlToJson(xmlDoc.documentElement)
           };
 
-          //Canvas Dimensions
           var outH = jsonResult.gridList.canvas["@attributes"].outH
           var outV = jsonResult.gridList.canvas["@attributes"].outV
-
           var numGrids = jsonResult.gridList.canvas.grid.length
 
+          //Init output string
           var outputData = `Canvas Size: ${outH} x ${outV}\n\n`
 
           if (numGrids>0) {
+            var grid = jsonResult.gridList.canvas.grid[i]["@attributes"]
+          } else {
+            var grid = jsonResult.gridList.canvas.grid["@attributes"]
+          }
 
-            for(i=0; i<numGrids; i++){
-              
-            grid = jsonResult.gridList.canvas.grid[i]["@attributes"]
+
+          for(i=0; i<numGrids; i++){
+
             gridWidth = grid.tileX*grid.cols
             gridHeight = grid.tileY*grid.rows
 
@@ -179,27 +182,8 @@
             gridData = `<b>${grid.gridName}:</b>\n\t${gridWidth}px x ${gridHeight}px\n\tCtr - X:${gridCtrX} Y:${gridCtrY}\n\tBottom Left - X:${gridBLX} Y:${gridBLY}\n\n`
             
             outputData += gridData
-            
           }
           
-          } else {
-
-            grid = jsonResult.gridList.canvas.grid["@attributes"]
-            gridWidth = grid.tileX*grid.cols
-            gridHeight = grid.tileY*grid.rows
-
-            gridCtrX = (outH/-2)+(gridWidth/2)+(parseInt(grid.offX))
-            gridCtrY = (outV/2)-(gridHeight/2)-(parseInt(grid.offY))
-
-            gridBLX = (outH/-2)+(parseInt(grid.offX))
-            gridBLY = (outV/2)-(gridHeight)-(parseInt(grid.offY))
-
-            gridData = `<b>${grid.gridName}:</b>\n\t${gridWidth}px x ${gridHeight}px\n\tCtr - X:${gridCtrX} Y:${gridCtrY}\n\tBottom Left - X:${gridBLX} Y:${gridBLY}\n\n`
-            
-            outputData += gridData
-
-        }
-
           const successMsg = [`Mission Accomplished`,`Nailed It`,`Yep Cool`,`Complete`,`Victory Secured`,`Crushed It`,`Done And Dusted`,`Superb`,`Good Jaaahb`,`Done-so`]
 
           log(
@@ -214,8 +198,6 @@
             ` \n`,
             "success"
           );
-          //log("test")
-
         } catch (err) {
           log(`XML Parse Error: ${err.message}`, "error");
         }
