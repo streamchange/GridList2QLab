@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Grid List → QLab</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 
   <style>
     body {
@@ -18,6 +19,10 @@
 
     h1 {
       margin-bottom: 0.5rem;
+    }
+
+    a {
+      color: #2f244e;
     }
 
     #drop-zone {
@@ -58,9 +63,15 @@
     input[type="file"] {
       display: none;
     }
+
     small{
-      color: #666666;
       filter: blur(2px);
+    }
+
+    #yell {
+      position:absolute;
+      bottom:0.5rem;
+
     }
   </style>
 
@@ -68,7 +79,7 @@
 <body>
 
   <h1>Grid List → QLab</h1>
-  <p>Drag and drop a <code>.pg3</code> file, or click to select one.</p>
+  <p>Drag and drop a <a href="https://videowalrus.com/pixl-grid/">Pixlgrid</a><code> .pg3</code> file, or click to select one.</p>
 
   <div id="drop-zone">
     Drop .pg3 file here or click to browse
@@ -78,7 +89,7 @@
 
   <div id="output">Output goes here:</div>
   <br/>
-  <small>Please dont yell at me I don't know what I'm doing</small>
+  <div id="yell"><a href="https://nikcarr.com"><small>Please dont yell at me I don't know what I'm doing</small></a></div>
 
   <script>
     const dropZone = document.getElementById("drop-zone");
