@@ -8,9 +8,12 @@
   <style>
     body {
       font-family: system-ui, Arial, sans-serif;
-      background: #f5f7fa;
       margin: 0;
       padding: 2rem;
+      background: #654ea3;  /* fallback for old browsers */
+      background: -webkit-linear-gradient(to right, #654ea3, #b889c2);  /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to right, #654ea3cc, #b889c2cc); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
     }
 
     h1 {
@@ -18,25 +21,25 @@
     }
 
     #drop-zone {
-      border: 2px dashed #6b7280;
+      border: 2px dashed #4d4e80;
       border-radius: 8px;
       padding: 3rem;
       text-align: center;
-      background: white;
+      background: #ffffff60;
       cursor: pointer;
       transition: background-color 0.2s, border-color 0.2s;
     }
 
     #drop-zone.dragover {
-      background: #eef2ff;
-      border-color: #4d4e80;
+      background: #ffffffaa;
+      border-color: #717196;
     }
 
     #output {
       margin-top: 2rem;
       background: #111827;
       color: #e5e7eb;
-      padding: 1rem;
+      padding: 2rem;
       border-radius: 6px;
       overflow: auto;
       max-height: 500px;
@@ -56,8 +59,8 @@
       display: none;
     }
     small{
-      color: #cccccc;
-      filter: blur(1px);
+      color: #666666;
+      filter: blur(2px);
     }
   </style>
 
@@ -73,7 +76,7 @@
 
   <input id="file-input" type="file" accept=".pg3" />
 
-  <div id="output"></div>
+  <div id="output">Output goes here:</div>
   <br/>
   <small>Please dont yell at me I don't know what I'm doing</small>
 
@@ -183,7 +186,7 @@
             
             outputData += gridData
           }
-          
+
           const successMsg = [`Mission Accomplished`,`Nailed It`,`Yep Cool`,`Complete`,`Victory Secured`,`Crushed It`,`Done And Dusted`,`Superb`,`Good Jaaahb`,`Done-so`]
 
           log(
