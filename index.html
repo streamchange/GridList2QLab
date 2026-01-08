@@ -174,11 +174,11 @@
 
           //Init output string
           var outputData = `Canvas Size: ${outH} x ${outV}\n\n`
-          var i = 1
+          //var i = 0
           if (numGrids>0) {
-            var grid = jsonResult.gridList.canvas.grid[i]["@attributes"]
+            
             for(i=0; i<numGrids; i++){
-
+              var grid = jsonResult.gridList.canvas.grid[i]["@attributes"]
               gridWidth = grid.tileX*grid.cols
               gridHeight = grid.tileY*grid.rows
 
@@ -188,7 +188,7 @@
               gridBLX = (outH/-2)+(parseInt(grid.offX))
               gridBLY = (outV/2)-(gridHeight)-(parseInt(grid.offY))
 
-              gridData = `<b>${grid.gridName}:</b>\n\t${gridWidth}px x ${gridHeight}px\n\tCtr - X:${gridCtrX} Y:${gridCtrY}\n\tBottom Left - X:${gridBLX} Y:${gridBLY}\n\n`
+              gridData = `<b>${grid.gridName}:</b>\n\t${gridWidth}px x ${gridHeight}px \n\tTop Left - X: ${grid.offX} Y:${grid.offY}\n\tCtr - X:${gridCtrX} Y:${gridCtrY}\n\tBottom Left - X:${gridBLX} Y:${gridBLY}\n\n`
 
               outputData += gridData
               }
@@ -206,7 +206,7 @@
             gridBLX = (outH/-2)+(parseInt(grid.offX))
             gridBLY = (outV/2)-(gridHeight)-(parseInt(grid.offY))
 
-            gridData = `<b>${grid.gridName}:</b>\n\t${gridWidth}px x ${gridHeight}px\n\tCtr - X:${gridCtrX} Y:${gridCtrY}\n\tBottom Left - X:${gridBLX} Y:${gridBLY}\n\n`
+            gridData = `<b>${grid.gridName}:</b>\n\t${gridWidth}px x ${gridHeight}px \n\tTop Left - X: ${grid.offX} Y:${grid.offY}\n\tCtr - X:${gridCtrX} Y:${gridCtrY}\n\tBottom Left - X:${gridBLX} Y:${gridBLY}\n\n`
 
             
             outputData += gridData
